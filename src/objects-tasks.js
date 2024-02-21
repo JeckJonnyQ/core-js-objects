@@ -93,8 +93,38 @@ function removeProperties(obj, keys) {
  *    compareObjects({a: 1, b: 2}, {a: 1, b: 2}) => true
  *    compareObjects({a: 1, b: 2}, {a: 1, b: 3}) => false
  */
-function compareObjects(/* obj1, obj2 */) {
-  throw new Error('Not implemented');
+function compareObjects(obj1, obj2) {
+  if (obj1 === obj2) {
+    return true;
+  }
+
+  if (typeof obj1 !== 'object' || typeof obj2 !== 'object') {
+    return false;
+  }
+
+  const keys1 = Object.keys(obj1);
+  const keys2 = Object.keys(obj2);
+
+  if (keys1.length !== keys2.length) {
+    return false;
+  }
+
+  let isValid = true;
+
+  keys1.forEach((key) => {
+    const value1 = obj1[key];
+    const value2 = obj2[key];
+
+    if (typeof value1 === 'object' && typeof value2 === 'object') {
+      if (JSON.stringify(value1) !== JSON.stringify(value2)) {
+        isValid = false;
+      }
+    } else if (value1 !== value2) {
+      isValid = false;
+    }
+  });
+
+  return isValid;
 }
 
 /**
