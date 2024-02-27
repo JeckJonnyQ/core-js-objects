@@ -404,32 +404,68 @@ function group(array, keySelector, valueSelector) {
  */
 
 const cssSelectorBuilder = {
-  element(/* value */) {
-    throw new Error('Not implemented');
+  selectors: '',
+  orderArray: [1, 2, 6],
+
+  createNewObject(value, order) {
+    const object = Object.create(this);
+    object.order = order;
+    object.selectors = this.selectors + value;
+    return object;
   },
 
-  id(/* value */) {
-    throw new Error('Not implemented');
+  element(value) {
+    this.checkOrder(1);
+    return this.createNewObject(value, 1);
   },
 
-  class(/* value */) {
-    throw new Error('Not implemented');
+  id(value) {
+    this.checkOrder(2);
+    return this.createNewObject(`#${value}`, 2);
   },
 
-  attr(/* value */) {
-    throw new Error('Not implemented');
+  class(value) {
+    this.checkOrder(3);
+    return this.createNewObject(`.${value}`, 3);
   },
 
-  pseudoClass(/* value */) {
-    throw new Error('Not implemented');
+  attr(value) {
+    this.checkOrder(4);
+    return this.createNewObject(`[${value}]`, 4);
   },
 
-  pseudoElement(/* value */) {
-    throw new Error('Not implemented');
+  pseudoClass(value) {
+    this.checkOrder(5);
+    return this.createNewObject(`:${value}`, 5);
   },
 
-  combine(/* selector1, combinator, selector2 */) {
-    throw new Error('Not implemented');
+  pseudoElement(value) {
+    this.checkOrder(6);
+    return this.createNewObject(`::${value}`, 6);
+  },
+
+  combine(selectorOne, combinator, selectorTwo) {
+    const obj = Object.create(this);
+    obj.selectors = `${selectorOne.selectors} ${combinator} ${selectorTwo.selectors}`;
+    return obj;
+  },
+
+  checkOrder(number) {
+    if (this.order === number && this.orderArray.includes(number)) {
+      throw new Error(
+        'Element, id and pseudo-element should not occur more then one time inside the selector'
+      );
+    }
+
+    if (this.order > number) {
+      throw new Error(
+        'Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element'
+      );
+    }
+  },
+
+  stringify() {
+    return this.selectors;
   },
 };
 
